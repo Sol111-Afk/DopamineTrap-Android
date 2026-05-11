@@ -11,12 +11,20 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Notifications
+import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.outlined.Psychology
+import androidx.compose.material.icons.outlined.BarChart
+import androidx.compose.material.icons.outlined.FamilyRestroom
+import androidx.compose.material.icons.outlined.Chat
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.draw.clip
+
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -37,6 +45,7 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import java.util.UUID
 import kotlin.math.roundToInt
 
 // ── Root screen ───────────────────────────────────────────────────────────────
@@ -69,21 +78,28 @@ fun ParentScreen() {
         isLoadingChildren = false
     }
 
+    var selectedTab by remember { mutableStateOf(0) }
+    var alertCount  by remember(selectedChild?.childId) { mutableStateOf(0) }
+
     Column(
         Modifier
             .fillMaxSize()
-            .background(androidx.compose.ui.graphics.Brush.verticalGradient(listOf(SfCream, SfBg2)))
+            .background(Color(0xFFF5F7FA))
     ) {
-        ParentHeader(childName = selectedChild?.childName)
+        ParentHeaderWithTabs(
+            childName    = selectedChild?.childName,
+            selectedTab  = selectedTab,
+            alertCount   = alertCount,
+            onTabSelected = { selectedTab = it }
+        )
 
         if (isLoadingChildren) {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator(color = SfDark)
+                CircularProgressIndicator(color = Color(0xFF3EDCB5))
             }
             return@Column
         }
 
-        // Eroare la încărcare — afișează eroarea și buton retry
         if (loadError != null) {
             Box(Modifier.fillMaxSize().padding(32.dp), contentAlignment = Alignment.Center) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -97,12 +113,14 @@ fun ParentScreen() {
             return@Column
         }
 
-        // Niciun copil — arată direct tab-ul Familie ca să știe cum să facă pairing
         if (children.isEmpty()) {
             FamilieTab(
                 familyId         = familyId,
                 children         = emptyList(),
-                onChildrenChanged = { }
+                onChildrenChanged = { updated ->
+                    children      = updated
+                    selectedChild = updated.firstOrNull()
+                }
             )
             return@Column
         }
@@ -112,34 +130,6 @@ fun ParentScreen() {
         }
 
         val child = selectedChild ?: children.first()
-
-        var selectedTab  by remember { mutableStateOf(0) }
-        var alertCount   by remember(child.childId) { mutableStateOf(0) }
-
-        TabRow(
-            selectedTabIndex = selectedTab,
-            containerColor   = Color.White,
-            contentColor     = SfDark
-        ) {
-            listOf("🔔 Alerte", "⚙️ Control", "🧠 Bunăstare", "📊 Rapoarte", "👨‍👧 Familie", "💬 Suport")
-                .forEachIndexed { i, label ->
-                    Tab(
-                        selected = selectedTab == i,
-                        onClick  = { selectedTab = i },
-                        text     = {
-                            if (i == 0 && alertCount > 0) {
-                                BadgedBox(badge = {
-                                    Badge { Text("$alertCount", style = MaterialTheme.typography.labelSmall) }
-                                }) {
-                                    Text(label, style = MaterialTheme.typography.labelSmall)
-                                }
-                            } else {
-                                Text(label, style = MaterialTheme.typography.labelSmall)
-                            }
-                        }
-                    )
-                }
-        }
 
         when (selectedTab) {
             0 -> NotificationsTab(familyId = familyId, childId = child.childId, onUnreadCount = { alertCount = it })
@@ -160,34 +150,118 @@ fun ParentScreen() {
     }
 }
 
-// ── Header ────────────────────────────────────────────────────────────────────
+// ── Header + Tab Bar ──────────────────────────────────────────────────────────
+
+private val tabIcons = listOf(
+    Icons.Outlined.Notifications to "Alerte",
+    Icons.Outlined.Settings      to "Control",
+    Icons.Outlined.Psychology    to "Bunăstare",
+    Icons.Outlined.BarChart      to "Rapoarte",
+    Icons.Outlined.FamilyRestroom to "Familie",
+    Icons.Outlined.Chat          to "Suport"
+)
 
 @Composable
-private fun ParentHeader(childName: String?) {
+private fun ParentHeaderWithTabs(
+    childName: String?,
+    selectedTab: Int,
+    alertCount: Int,
+    onTabSelected: (Int) -> Unit
+) {
+    val teal = Color(0xFF3EDCB5)
+    val blue = Color(0xFF5B8FE0)
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .background(SfMid)
-            .padding(horizontal = 24.dp, vertical = 24.dp)
+            .background(Brush.horizontalGradient(listOf(teal, blue)))
+            .statusBarsPadding()
+            .padding(start = 20.dp, end = 20.dp, top = 20.dp, bottom = 16.dp)
     ) {
         Column {
-            Text(
-                "Panou Părinte",
-                style        = MaterialTheme.typography.titleSmall,
-                color        = SfCream.copy(alpha = 0.65f),
-                letterSpacing = 1.sp
-            )
-            if (childName != null) {
-                Spacer(Modifier.height(2.dp))
-                Text(
-                    childName,
-                    style      = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Bold,
-                    color      = SfCream
-                )
+            Row(
+                modifier              = Modifier.fillMaxWidth(),
+                verticalAlignment     = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Column {
+                    Text(
+                        "Panou Părinte",
+                        style         = MaterialTheme.typography.titleSmall,
+                        color         = Color.White.copy(alpha = 0.75f),
+                        letterSpacing = 1.sp
+                    )
+                    if (childName != null) {
+                        Spacer(Modifier.height(2.dp))
+                        Text(
+                            childName,
+                            style      = MaterialTheme.typography.headlineLarge,
+                            fontWeight = FontWeight.Bold,
+                            color      = Color.White
+                        )
+                    }
+                }
+                Text("👨‍👩‍👧", fontSize = 30.sp)
             }
+
+            Spacer(Modifier.height(16.dp))
+
+            Card(
+                modifier  = Modifier.fillMaxWidth(),
+                shape     = RoundedCornerShape(24.dp),
+                colors    = CardDefaults.cardColors(containerColor = Color.White),
+                elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
+            ) {
+                Row(
+                    modifier              = Modifier.fillMaxWidth().padding(horizontal = 2.dp, vertical = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    tabIcons.forEachIndexed { i, (icon, label) ->
+                        val isSelected = selectedTab == i
+                        val iconColor  = if (isSelected) blue else Color(0xFF9E9E9E)
+
+                        Column(
+                            modifier            = Modifier
+                                .weight(1f)
+                                .clickable { onTabSelected(i) }
+                                .padding(vertical = 4.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            if (i == 0 && alertCount > 0) {
+                                BadgedBox(badge = {
+                                    Badge(containerColor = Color(0xFFE53935)) {
+                                        Text("$alertCount", style = MaterialTheme.typography.labelSmall, color = Color.White)
+                                    }
+                                }) {
+                                    Icon(icon, contentDescription = label, tint = iconColor, modifier = Modifier.size(24.dp))
+                                }
+                            } else {
+                                Icon(icon, contentDescription = label, tint = iconColor, modifier = Modifier.size(24.dp))
+                            }
+                            Spacer(Modifier.height(3.dp))
+                            Text(
+                                label,
+                                style    = MaterialTheme.typography.labelSmall,
+                                color    = if (isSelected) blue else Color(0xFF9E9E9E),
+                                fontSize = 9.sp
+                            )
+                            Spacer(Modifier.height(3.dp))
+                            if (isSelected) {
+                                Box(
+                                    Modifier
+                                        .width(24.dp)
+                                        .height(2.dp)
+                                        .background(blue, RoundedCornerShape(1.dp))
+                                )
+                            } else {
+                                Spacer(Modifier.height(2.dp))
+                            }
+                        }
+                    }
+                }
+            }
+            Spacer(Modifier.height(4.dp))
         }
-        Text("👨‍👧", fontSize = 34.sp, modifier = Modifier.align(Alignment.CenterEnd))
     }
 }
 
@@ -512,33 +586,30 @@ private fun ControlTab(familyId: String, child: ChildInfo) {
 
         FeatureTogglesCard(settings = settings, onSettingsChange = { settings = it })
 
-        Button(
-            onClick = {
-                isSaving    = true
-                saveMessage = null
-                scope.launch {
-                    runCatching {
-                        FirebaseRepository.pushSettings(familyId, child.childId, settings)
-                        saveMessage = "Setări salvate!"
-                    }.onFailure {
-                        saveMessage = "Eroare: ${it.message}"
+        Box(
+            modifier = Modifier
+                .fillMaxWidth().height(52.dp)
+                .clip(RoundedCornerShape(14.dp))
+                .background(
+                    if (!isSaving) Brush.horizontalGradient(listOf(Color(0xFF3EDCB5), Color(0xFF5B8FE0)))
+                    else Brush.horizontalGradient(listOf(Color(0xFFB0BEC5), Color(0xFFB0BEC5)))
+                )
+                .clickable(enabled = !isSaving) {
+                    isSaving = true; saveMessage = null
+                    scope.launch {
+                        runCatching {
+                            FirebaseRepository.pushSettings(familyId, child.childId, settings)
+                            saveMessage = "Setări salvate!"
+                        }.onFailure { saveMessage = "Eroare: ${it.message}" }
+                        isSaving = false
                     }
-                    isSaving = false
-                }
-            },
-            enabled  = !isSaving,
-            modifier = Modifier.fillMaxWidth().height(52.dp),
-            shape    = RoundedCornerShape(14.dp),
-            colors   = ButtonDefaults.buttonColors(
-                containerColor = SfDark,
-                contentColor   = SfCream,
-                disabledContainerColor = SfDark.copy(0.5f)
-            )
+                },
+            contentAlignment = Alignment.Center
         ) {
             if (isSaving)
                 CircularProgressIndicator(modifier = Modifier.size(22.dp), color = Color.White, strokeWidth = 2.dp)
             else
-                Text("Aplică setările", fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
+                Text("Aplică setările", fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = Color.White)
         }
 
         saveMessage?.let { msg ->
@@ -1053,13 +1124,16 @@ private fun FamilieTab(
             verticalAlignment     = Alignment.CenterVertically
         ) {
             Text("Familia mea", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-            Button(
-                onClick        = { showAddDialog = true },
-                shape          = RoundedCornerShape(28.dp),
-                colors         = ButtonDefaults.buttonColors(containerColor = SfDark, contentColor = SfCream),
-                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
+            Box(
+                modifier = Modifier
+                    .height(36.dp)
+                    .clip(RoundedCornerShape(28.dp))
+                    .background(Brush.horizontalGradient(listOf(Color(0xFF3EDCB5), Color(0xFF5B8FE0))))
+                    .clickable { showAddDialog = true }
+                    .padding(horizontal = 16.dp),
+                contentAlignment = Alignment.Center
             ) {
-                Text("+ Adaugă copil", style = MaterialTheme.typography.labelSmall)
+                Text("+ Adaugă copil", style = MaterialTheme.typography.labelSmall, color = Color.White)
             }
         }
 
@@ -1240,31 +1314,31 @@ private fun SupportTab(familyId: String, childId: String) {
             }
         }
 
-        Button(
-            onClick = {
-                if (message.isBlank()) return@Button
-                isSending = true
-                result    = null
-                scope.launch {
-                    runCatching {
-                        FirebaseRepository.submitFeedback(familyId, childId, selectedCategory, message)
-                        message = ""
-                        result  = "Mesaj trimis! Te contactăm în curând."
-                    }.onFailure {
-                        result = "Eroare la trimitere. Încearcă din nou."
+        val canSend = !isSending && message.isNotBlank()
+        Box(
+            modifier = Modifier
+                .fillMaxWidth().height(52.dp)
+                .clip(RoundedCornerShape(14.dp))
+                .background(
+                    if (canSend) Brush.horizontalGradient(listOf(Color(0xFF3EDCB5), Color(0xFF5B8FE0)))
+                    else Brush.horizontalGradient(listOf(Color(0xFFB0BEC5), Color(0xFFB0BEC5)))
+                )
+                .clickable(enabled = canSend) {
+                    isSending = true; result = null
+                    scope.launch {
+                        runCatching {
+                            FirebaseRepository.submitFeedback(familyId, childId, selectedCategory, message)
+                            message = ""; result = "Mesaj trimis! Te contactăm în curând."
+                        }.onFailure { result = "Eroare la trimitere. Încearcă din nou." }
+                        isSending = false
                     }
-                    isSending = false
-                }
-            },
-            enabled  = !isSending && message.isNotBlank(),
-            modifier = Modifier.fillMaxWidth().height(52.dp),
-            shape    = RoundedCornerShape(14.dp),
-            colors   = ButtonDefaults.buttonColors(containerColor = SfDark)
+                },
+            contentAlignment = Alignment.Center
         ) {
             if (isSending)
                 CircularProgressIndicator(modifier = Modifier.size(22.dp), color = Color.White, strokeWidth = 2.dp)
             else
-                Text("Trimite mesaj", fontWeight = FontWeight.SemiBold)
+                Text("Trimite mesaj", fontWeight = FontWeight.SemiBold, color = Color.White)
         }
 
         result?.let { msg ->

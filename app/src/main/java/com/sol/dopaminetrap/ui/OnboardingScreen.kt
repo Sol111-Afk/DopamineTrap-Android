@@ -12,9 +12,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -58,98 +61,92 @@ fun ModeSelectionScreen(onModeSelected: (DeviceMode) -> Unit) {
     val teal = Color(0xFF3EDCB5)
     val blue = Color(0xFF5B8FE0)
 
-    Box(
+    Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Brush.verticalGradient(listOf(Color(0xFFF4F7FA), Color(0xFFE8EFF8))))
+            .padding(horizontal = 32.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Logo + text centrate, usor deasupra centrului ecranului
-        Column(
+        Spacer(Modifier.weight(2f))
+
+        Image(
+            painter            = painterResource(R.drawable.ic_safeland_logo),
+            contentDescription = null,
+            modifier           = Modifier.size(220.dp).align(Alignment.CenterHorizontally).offset(x = (-10).dp),
+            contentScale       = ContentScale.Fit
+        )
+        Spacer(Modifier.height(8.dp))
+        Text(
+            text = buildAnnotatedString {
+                withStyle(SpanStyle(color = SfDark, fontWeight = FontWeight.Bold)) { append("safe ") }
+                withStyle(SpanStyle(color = teal,   fontWeight = FontWeight.Bold)) { append("land") }
+            },
+            fontSize      = 40.sp,
+            letterSpacing = 0.sp
+        )
+
+        Spacer(Modifier.weight(0.5f))
+
+        Box(
             modifier = Modifier
-                .align(Alignment.Center)
-                .offset(y = (-48).dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .fillMaxWidth()
+                .height(56.dp)
+                .clip(RoundedCornerShape(28.dp))
+                .background(Brush.horizontalGradient(listOf(teal, blue)))
+                .clickable { onModeSelected(DeviceMode.PARENT) },
+            contentAlignment = Alignment.Center
         ) {
-            Image(
-                painter            = painterResource(R.drawable.ic_safeland_logo),
-                contentDescription = null,
-                modifier           = Modifier.size(220.dp),
-                contentScale       = ContentScale.Fit
-            )
-            Spacer(Modifier.height(12.dp))
             Text(
-                text = buildAnnotatedString {
-                    withStyle(SpanStyle(color = SfDark, fontWeight = FontWeight.Bold)) { append("safe ") }
-                    withStyle(SpanStyle(color = teal,   fontWeight = FontWeight.Bold)) { append("land") }
-                },
-                fontSize      = 40.sp,
-                letterSpacing = 0.sp
+                "Părinte",
+                color      = Color.White,
+                style      = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
             )
         }
 
-        // Butoane + tagline fixate jos
-        Column(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(horizontal = 32.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp)
-                    .clip(RoundedCornerShape(28.dp))
-                    .background(Brush.horizontalGradient(listOf(teal, blue)))
-                    .clickable { onModeSelected(DeviceMode.PARENT) },
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    "Părinte",
-                    color      = Color.White,
-                    style      = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
-                )
-            }
+        Spacer(Modifier.height(14.dp))
 
-            Spacer(Modifier.height(14.dp))
-
-            OutlinedButton(
-                onClick  = { onModeSelected(DeviceMode.CHILD) },
-                modifier = Modifier.fillMaxWidth().height(56.dp),
-                shape    = RoundedCornerShape(28.dp),
-                border   = BorderStroke(1.5.dp, Color(0xFFD0DCE8)),
-                colors   = ButtonDefaults.outlinedButtonColors(
-                    containerColor = Color.White,
-                    contentColor   = SfDark
-                )
-            ) {
-                Text("Copil", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Medium)
-            }
-
-            Spacer(Modifier.height(24.dp))
-
-            Text(
-                text = buildAnnotatedString {
-                    withStyle(SpanStyle(color = SfDark)) { append("DISCONNECT ") }
-                    withStyle(SpanStyle(color = teal))   { append("TODAY.") }
-                    withStyle(SpanStyle(color = SfDark)) { append(" CONNECT ") }
-                    withStyle(SpanStyle(color = teal))   { append("TOMORROW.") }
-                },
-                fontSize      = 11.sp,
-                letterSpacing = 2.sp,
-                fontWeight    = FontWeight.Medium,
-                textAlign     = TextAlign.Center
+        OutlinedButton(
+            onClick  = { onModeSelected(DeviceMode.CHILD) },
+            modifier = Modifier.fillMaxWidth().height(56.dp),
+            shape    = RoundedCornerShape(28.dp),
+            border   = BorderStroke(1.5.dp, Color(0xFFD0DCE8)),
+            colors   = ButtonDefaults.outlinedButtonColors(
+                containerColor = Color.White,
+                contentColor   = SfDark
             )
-
-            Spacer(Modifier.height(36.dp))
+        ) {
+            Text("Copil", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Medium)
         }
+
+        Spacer(Modifier.height(24.dp))
+
+        Text(
+            text = buildAnnotatedString {
+                withStyle(SpanStyle(color = SfDark)) { append("DISCONNECT ") }
+                withStyle(SpanStyle(color = teal))   { append("TODAY.") }
+                withStyle(SpanStyle(color = SfDark)) { append(" CONNECT ") }
+                withStyle(SpanStyle(color = teal))   { append("TOMORROW.") }
+            },
+            fontSize      = 11.sp,
+            letterSpacing = 1.5.sp,
+            fontWeight    = FontWeight.Medium,
+            textAlign     = TextAlign.Center,
+            maxLines      = 1
+        )
+
+        Spacer(Modifier.weight(2f))
     }
 }
 
 // ── Pasul 2a — copil: nume + vârstă, generează cod ──────────────────────────
 
 @Composable
-fun ChildSetupScreen(onDone: (familyId: String, childId: String, childName: String, childAge: Int) -> Unit) {
+fun ChildSetupScreen(
+    onDone: (familyId: String, childId: String, childName: String, childAge: Int) -> Unit,
+    onBack: () -> Unit = {}
+) {
     val scope = rememberCoroutineScope()
 
     var childName    by remember { mutableStateOf("") }
@@ -187,61 +184,83 @@ fun ChildSetupScreen(onDone: (familyId: String, childId: String, childName: Stri
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize().then(GradientBg)) {
+    val teal = Color(0xFF3EDCB5)
+    val blue = Color(0xFF5B8FE0)
+
+    Column(modifier = Modifier.fillMaxSize().imePadding().background(Color(0xFFF5F7FA))) {
+
+        // ── Header gradient ──────────────────────────────────────────────────
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Brush.horizontalGradient(listOf(teal, blue)))
+                .statusBarsPadding()
+                .padding(start = 24.dp, end = 24.dp, top = 20.dp, bottom = 28.dp)
+        ) {
+            Column {
+                IconButton(onClick = onBack, modifier = Modifier.offset(x = (-12).dp)) {
+                    Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = "Înapoi", tint = Color.White)
+                }
+                Text(
+                    "Configurează pentru copil",
+                    style      = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold,
+                    color      = SfDark
+                )
+                Spacer(Modifier.height(6.dp))
+                Text(
+                    "Cum se numește copilul și câți ani are?",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = SfGray
+                )
+                Spacer(Modifier.height(4.dp))
+            }
+        }
+
+        // ── Conținut ─────────────────────────────────────────────────────────
         Column(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 32.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp, vertical = 28.dp)
         ) {
-            Text(
-                "Configureaza pentru copil",
-                style      = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold,
-                color      = SfDark
-            )
-            Spacer(Modifier.height(16.dp))
-
             if (!nameConfirmed) {
                 Text(
-                    "Cum se numeste copilul si cati ani are?",
-                    style     = MaterialTheme.typography.bodyMedium,
-                    textAlign = TextAlign.Center,
-                    color     = SfGray
+                    "PRENUMELE COPILULUI",
+                    style         = MaterialTheme.typography.labelSmall,
+                    color         = SfLGray,
+                    letterSpacing = 1.5.sp
                 )
-                Spacer(Modifier.height(24.dp))
-
-                OutlinedTextField(
-                    value         = childName,
-                    onValueChange = { childName = it },
-                    label         = { Text("Prenumele copilului") },
-                    singleLine    = true,
-                    modifier      = Modifier.fillMaxWidth(),
-                    shape         = RoundedCornerShape(12.dp),
-                    colors        = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor   = SfDark,
-                        unfocusedBorderColor = SfBorder,
-                        focusedLabelColor    = SfDark,
-                        unfocusedLabelColor  = SfGray,
-                        focusedTextColor     = SfDark,
-                        unfocusedTextColor   = SfDark
+                Spacer(Modifier.height(8.dp))
+                Surface(
+                    modifier        = Modifier.fillMaxWidth(),
+                    shape           = RoundedCornerShape(12.dp),
+                    color           = Color.White,
+                    shadowElevation = 2.dp
+                ) {
+                    TextField(
+                        value         = childName,
+                        onValueChange = { childName = it },
+                        placeholder   = { Text("ex: Ionel", color = SfLGray) },
+                        singleLine    = true,
+                        modifier      = Modifier.fillMaxWidth(),
+                        colors        = TextFieldDefaults.colors(
+                            unfocusedContainerColor  = Color.White,
+                            focusedContainerColor    = Color.White,
+                            unfocusedIndicatorColor  = Color.Transparent,
+                            focusedIndicatorColor    = Color.Transparent,
+                            unfocusedTextColor       = SfDark,
+                            focusedTextColor         = SfDark
+                        )
                     )
-                )
+                }
                 Spacer(Modifier.height(24.dp))
-
                 Row(
                     Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment     = Alignment.CenterVertically
                 ) {
-                    Text("Vârsta", style = MaterialTheme.typography.bodyMedium, color = SfDark)
-                    Text(
-                        "$childAge ani",
-                        style      = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Bold,
-                        color      = SfDark
-                    )
+                    Text("VÂRSTA", style = MaterialTheme.typography.labelSmall, color = SfLGray, letterSpacing = 1.5.sp)
+                    Text("$childAge ani", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold, color = blue)
                 }
                 Slider(
                     value         = childAge.toFloat(),
@@ -250,55 +269,63 @@ fun ChildSetupScreen(onDone: (familyId: String, childId: String, childName: Stri
                     steps         = 14,
                     modifier      = Modifier.fillMaxWidth(),
                     colors        = SliderDefaults.colors(
-                        thumbColor             = SfDark,
-                        activeTrackColor       = SfDark,
-                        inactiveTrackColor     = SfBorder
+                        thumbColor        = blue,
+                        activeTrackColor  = teal,
+                        inactiveTrackColor = SfBorder
                     )
                 )
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                     Text("3 ani",  style = MaterialTheme.typography.labelSmall, color = SfLGray)
                     Text("18 ani", style = MaterialTheme.typography.labelSmall, color = SfLGray)
                 }
-
                 Spacer(Modifier.height(32.dp))
-                Button(
-                    onClick  = {
-                        nameConfirmed = true
-                        generateCode(childName.trim().ifEmpty { "Copil" })
-                    },
-                    modifier = Modifier.fillMaxWidth().height(56.dp),
-                    shape    = RoundedCornerShape(28.dp),
-                    colors   = ButtonDefaults.buttonColors(containerColor = SfDark, contentColor = SfCream)
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp)
+                        .clip(RoundedCornerShape(28.dp))
+                        .background(Brush.horizontalGradient(listOf(teal, blue)))
+                        .clickable {
+                            nameConfirmed = true
+                            generateCode(childName.trim().ifEmpty { "Copil" })
+                        },
+                    contentAlignment = Alignment.Center
                 ) {
-                    Text("Continua", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Text("Continuă", color = Color.White, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                 }
 
             } else {
-                // Pairing code screen
                 Text(
-                    "Da codul de mai jos parintelui. El il va introduce in aplicatia lui pentru a se conecta.",
+                    "Dă codul de mai jos părintelui. El îl va introduce în aplicația lui pentru a se conecta.",
                     style     = MaterialTheme.typography.bodyMedium,
                     textAlign = TextAlign.Center,
                     color     = SfGray
                 )
                 Spacer(Modifier.height(40.dp))
-
                 if (isLoading) {
-                    CircularProgressIndicator(color = SfDark)
+                    Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator(color = teal)
+                    }
                 } else if (error != null) {
                     Text(error!!, color = MaterialTheme.colorScheme.error, textAlign = TextAlign.Center)
                     Spacer(Modifier.height(16.dp))
-                    Button(
-                        onClick  = { generateCode(childName.trim().ifEmpty { "Copil" }) },
-                        shape    = RoundedCornerShape(28.dp),
-                        colors   = ButtonDefaults.buttonColors(containerColor = SfDark, contentColor = SfCream)
-                    ) { Text("Incearca din nou") }
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(48.dp)
+                            .clip(RoundedCornerShape(24.dp))
+                            .background(Brush.horizontalGradient(listOf(teal, blue)))
+                            .clickable { generateCode(childName.trim().ifEmpty { "Copil" }) },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("Încearcă din nou", color = Color.White, fontWeight = FontWeight.Bold)
+                    }
                 } else {
                     Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        shape    = RoundedCornerShape(16.dp),
-                        colors   = CardDefaults.cardColors(containerColor = Color.White),
-                        border   = BorderStroke(1.dp, SfBorder),
+                        modifier  = Modifier.fillMaxWidth(),
+                        shape     = RoundedCornerShape(16.dp),
+                        colors    = CardDefaults.cardColors(containerColor = Color.White),
+                        border    = BorderStroke(1.dp, SfBorder),
                         elevation = CardDefaults.cardElevation(0.dp)
                     ) {
                         Text(
@@ -314,34 +341,37 @@ fun ChildSetupScreen(onDone: (familyId: String, childId: String, childName: Stri
                         )
                     }
                     Spacer(Modifier.height(40.dp))
-                    Button(
-                        onClick  = {
-                            isLoading = true
-                            scope.launch {
-                                val resolvedFamilyId = runCatching {
-                                    Firebase.firestore.collection("pairing").document(pairingCode)
-                                        .get().await().getString("resolvedFamilyId")
-                                }.getOrNull() ?: familyId
-                                if (resolvedFamilyId != familyId) {
-                                    runCatching {
-                                        FirebaseRepository.registerChild(
-                                            resolvedFamilyId, childId,
-                                            childName.trim().ifEmpty { "Copil" }
-                                        )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(56.dp)
+                            .clip(RoundedCornerShape(28.dp))
+                            .background(Brush.horizontalGradient(listOf(teal, blue)))
+                            .clickable {
+                                isLoading = true
+                                scope.launch {
+                                    val resolvedFamilyId = runCatching {
+                                        Firebase.firestore.collection("pairing").document(pairingCode)
+                                            .get().await().getString("resolvedFamilyId")
+                                    }.getOrNull() ?: familyId
+                                    if (resolvedFamilyId != familyId) {
+                                        runCatching {
+                                            FirebaseRepository.registerChild(
+                                                resolvedFamilyId, childId,
+                                                childName.trim().ifEmpty { "Copil" }
+                                            )
+                                        }
                                     }
+                                    isLoading = false
+                                    onDone(resolvedFamilyId, childId, childName.trim().ifEmpty { "Copil" }, childAge)
                                 }
-                                isLoading = false
-                                onDone(resolvedFamilyId, childId, childName.trim().ifEmpty { "Copil" }, childAge)
-                            }
-                        },
-                        modifier = Modifier.fillMaxWidth().height(56.dp),
-                        shape    = RoundedCornerShape(28.dp),
-                        colors   = ButtonDefaults.buttonColors(containerColor = SfDark, contentColor = SfCream)
+                            },
+                        contentAlignment = Alignment.Center
                     ) {
                         if (isLoading)
-                            CircularProgressIndicator(Modifier.size(24.dp), color = SfCream, strokeWidth = 2.dp)
+                            CircularProgressIndicator(Modifier.size(24.dp), color = Color.White, strokeWidth = 2.dp)
                         else
-                            Text("Parintele a introdus codul — Continua", fontWeight = FontWeight.Bold)
+                            Text("Părintele a introdus codul — Continuă", color = Color.White, fontWeight = FontWeight.Bold)
                     }
                 }
             }
@@ -352,20 +382,32 @@ fun ChildSetupScreen(onDone: (familyId: String, childId: String, childName: Stri
 // ── Pasul 2b — parinte: introduce codul copilului ────────────────────────────
 
 @Composable
-fun ParentSetupScreen(onDone: (familyId: String, childId: String, childName: String) -> Unit) {
+fun ParentSetupScreen(
+    onDone: (familyId: String, childId: String, childName: String) -> Unit,
+    onBack: () -> Unit = {}
+) {
     val scope = rememberCoroutineScope()
     var code      by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
     var error     by remember { mutableStateOf<String?>(null) }
 
     Box(modifier = Modifier.fillMaxSize().then(GradientBg)) {
+        IconButton(
+            onClick  = onBack,
+            modifier = Modifier.padding(top = 36.dp, start = 8.dp).align(Alignment.TopStart)
+        ) {
+            Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = "Înapoi", tint = SfDark)
+        }
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .imePadding()
+                .verticalScroll(rememberScrollState())
                 .padding(horizontal = 32.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Spacer(Modifier.height(16.dp))
             Text(
                 "Conecteaza-te la copil",
                 style      = MaterialTheme.typography.headlineSmall,
@@ -412,29 +454,37 @@ fun ParentSetupScreen(onDone: (familyId: String, childId: String, childName: Str
 
             Spacer(Modifier.height(32.dp))
 
-            Button(
-                onClick = {
-                    if (code.length != 6) { error = "Codul trebuie sa aiba 6 cifre."; return@Button }
-                    isLoading = true
-                    error = null
-                    scope.launch {
-                        runCatching {
-                            val doc  = Firebase.firestore.collection("pairing").document(code).get().await()
-                            if (!doc.exists()) throw Exception("Cod invalid sau expirat.")
-                            val fid  = doc.getString("familyId")  ?: throw Exception("Date corupte.")
-                            val cid  = doc.getString("childId")   ?: throw Exception("Date corupte.")
-                            val name = doc.getString("childName") ?: "Copil"
-                            onDone(fid, cid, name)
-                        }.onFailure { error = it.message ?: "Eroare necunoscuta."; isLoading = false }
-                    }
-                },
-                enabled  = !isLoading && code.length == 6,
-                modifier = Modifier.fillMaxWidth().height(56.dp),
-                shape    = RoundedCornerShape(28.dp),
-                colors   = ButtonDefaults.buttonColors(containerColor = SfDark, contentColor = SfCream)
+            val canConnect = !isLoading && code.length == 6
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp)
+                    .clip(RoundedCornerShape(28.dp))
+                    .background(
+                        if (canConnect)
+                            Brush.horizontalGradient(listOf(Color(0xFF3EDCB5), Color(0xFF5B8FE0)))
+                        else
+                            Brush.horizontalGradient(listOf(Color(0xFFB0BEC5), Color(0xFFB0BEC5)))
+                    )
+                    .clickable(enabled = canConnect) {
+                        if (code.length != 6) { error = "Codul trebuie sa aiba 6 cifre."; return@clickable }
+                        isLoading = true
+                        error = null
+                        scope.launch {
+                            runCatching {
+                                val doc  = Firebase.firestore.collection("pairing").document(code).get().await()
+                                if (!doc.exists()) throw Exception("Cod invalid sau expirat.")
+                                val fid  = doc.getString("familyId")  ?: throw Exception("Date corupte.")
+                                val cid  = doc.getString("childId")   ?: throw Exception("Date corupte.")
+                                val name = doc.getString("childName") ?: "Copil"
+                                onDone(fid, cid, name)
+                            }.onFailure { error = it.message ?: "Eroare necunoscuta."; isLoading = false }
+                        }
+                    },
+                contentAlignment = Alignment.Center
             ) {
-                if (isLoading) CircularProgressIndicator(Modifier.size(24.dp), color = SfCream, strokeWidth = 2.dp)
-                else Text("Conecteaza", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                if (isLoading) CircularProgressIndicator(Modifier.size(24.dp), color = Color.White, strokeWidth = 2.dp)
+                else Text("Conectează", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = Color.White)
             }
         }
     }
@@ -476,47 +526,97 @@ fun PermissionsGuideScreen(onComplete: () -> Unit) {
         Triple("Permisiune SMS",             "Monitorizează mesajele SMS primite.",                                     smsGranted)
     )
 
-    Box(modifier = Modifier.fillMaxSize().then(GradientBg)) {
-        Column(
+    val teal = Color(0xFF3EDCB5)
+    val blue = Color(0xFF5B8FE0)
+
+    Column(modifier = Modifier.fillMaxSize().background(Color(0xFFF5F7FA))) {
+
+        // ── Header gradient ──────────────────────────────────────────────────
+        Box(
             modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp))
+                .background(Brush.horizontalGradient(listOf(teal, blue)))
+                .statusBarsPadding()
+                .padding(start = 24.dp, end = 24.dp, top = 24.dp, bottom = 28.dp)
+        ) {
+            Column(modifier = Modifier.fillMaxWidth().padding(end = 72.dp)) {
+                Text(
+                    "Activează permisiunile",
+                    style      = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold,
+                    color      = Color.White
+                )
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    "Aceste permisiuni permit Safeland să funcționeze corect. Le poți activa oricând din setările telefonului.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.White.copy(alpha = 0.85f)
+                )
+            }
+            Box(
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .size(56.dp)
+                    .clip(CircleShape)
+                    .background(Color.White.copy(alpha = 0.2f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Text("⚠️", fontSize = 26.sp)
+            }
+        }
+
+        // ── Conținut ─────────────────────────────────────────────────────────
+        Column(
+            modifier            = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 24.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .padding(horizontal = 20.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Spacer(Modifier.height(32.dp))
-            Text(
-                "Activează permisiunile",
-                style      = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold,
-                color      = SfDark,
-                textAlign  = TextAlign.Center
-            )
-            Text(
-                "Aceste permisiuni permit Safeland să funcționeze corect. Le poți activa oricând și din setările telefonului.",
-                style     = MaterialTheme.typography.bodyMedium,
-                textAlign = TextAlign.Center,
-                color     = SfGray
-            )
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(20.dp))
 
             permissions.forEachIndexed { index, (title, desc, granted) ->
                 Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape    = RoundedCornerShape(14.dp),
-                    colors   = CardDefaults.cardColors(
-                        containerColor = if (granted) SfWarnBg else Color.White
-                    ),
-                    border   = BorderStroke(1.dp, SfBorder),
-                    elevation = CardDefaults.cardElevation(0.dp)
+                    modifier  = Modifier.fillMaxWidth(),
+                    shape     = RoundedCornerShape(14.dp),
+                    colors    = CardDefaults.cardColors(containerColor = Color.White),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                 ) {
                     Row(
-                        modifier = Modifier.padding(16.dp),
-                        verticalAlignment = Alignment.CenterVertically,
+                        modifier              = Modifier.padding(16.dp),
+                        verticalAlignment     = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        Text(if (granted) "✅" else "⬜", fontSize = 22.sp)
+                        Box(
+                            modifier         = Modifier
+                                .size(36.dp)
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(if (granted) teal else Color.Transparent)
+                                .then(if (!granted) Modifier else Modifier),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            if (granted) {
+                                Text("✓", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                            } else {
+                                Box(
+                                    modifier = Modifier
+                                        .size(36.dp)
+                                        .clip(RoundedCornerShape(8.dp))
+                                        .background(Color.White)
+                                        .then(Modifier),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(34.dp)
+                                            .clip(RoundedCornerShape(7.dp))
+                                            .background(Color.White)
+                                    )
+                                }
+                                Text("□", color = blue, fontSize = 26.sp)
+                            }
+                        }
                         Column(Modifier.weight(1f)) {
                             Text(title, style = MaterialTheme.typography.bodyMedium,
                                 fontWeight = FontWeight.SemiBold, color = SfDark)
@@ -535,7 +635,7 @@ fun PermissionsGuideScreen(onComplete: () -> Unit) {
                                 }
                             ) {
                                 Text("Activează", style = MaterialTheme.typography.labelMedium,
-                                    color = SfDark, fontWeight = FontWeight.SemiBold)
+                                    color = blue, fontWeight = FontWeight.SemiBold)
                             }
                         }
                     }
@@ -544,22 +644,29 @@ fun PermissionsGuideScreen(onComplete: () -> Unit) {
 
             Spacer(Modifier.height(8.dp))
 
-            Button(
-                onClick  = onComplete,
-                modifier = Modifier.fillMaxWidth().height(56.dp),
-                shape    = RoundedCornerShape(28.dp),
-                colors   = ButtonDefaults.buttonColors(containerColor = SfDark, contentColor = SfCream)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp)
+                    .clip(RoundedCornerShape(28.dp))
+                    .background(Brush.horizontalGradient(listOf(teal, blue)))
+                    .clickable { onComplete() },
+                contentAlignment = Alignment.Center
             ) {
                 Text(
                     if (permissions.all { it.third }) "Gata — intru în aplicație"
                     else "Continuă fără toate permisiunile",
+                    color      = Color.White,
                     style      = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
             }
 
             if (!permissions.all { it.third }) {
-                TextButton(onClick = { refreshPermissions() }) {
+                TextButton(
+                    onClick  = { refreshPermissions() },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
                     Text("Actualizează starea permisiunilor",
                         style = MaterialTheme.typography.bodySmall, color = SfLGray)
                 }
@@ -589,10 +696,13 @@ fun OnboardingScreen(onOnboardingComplete: () -> Unit) {
             ModeSelectionScreen(onModeSelected = { selectedMode = it })
 
         selectedMode == DeviceMode.CHILD && !childSetupDone ->
-            ChildSetupScreen(onDone = { fid, cid, name, age ->
-                pendingFamilyId = fid; pendingChildId = cid; pendingName = name; pendingAge = age
-                childSetupDone  = true
-            })
+            ChildSetupScreen(
+                onDone = { fid, cid, name, age ->
+                    pendingFamilyId = fid; pendingChildId = cid; pendingName = name; pendingAge = age
+                    childSetupDone  = true
+                },
+                onBack = { selectedMode = null }
+            )
 
         selectedMode == DeviceMode.CHILD && childSetupDone ->
             PermissionsGuideScreen(onComplete = {
@@ -610,9 +720,12 @@ fun OnboardingScreen(onOnboardingComplete: () -> Unit) {
             })
 
         selectedMode == DeviceMode.PARENT ->
-            ParentSetupScreen(onDone = { fid, cid, name ->
-                OnboardingManager.completeOnboarding(context, DeviceMode.PARENT, fid, cid, name)
-                onOnboardingComplete()
-            })
+            ParentSetupScreen(
+                onDone = { fid, cid, name ->
+                    OnboardingManager.completeOnboarding(context, DeviceMode.PARENT, fid, cid, name)
+                    onOnboardingComplete()
+                },
+                onBack = { selectedMode = null }
+            )
     }
 }

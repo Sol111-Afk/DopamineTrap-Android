@@ -7,6 +7,7 @@ import android.provider.Settings
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -104,7 +105,7 @@ fun ChildScreen(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(Brush.verticalGradient(listOf(SfCream, SfBg2)))
+            .background(Color(0xFFF5F7FA))
     ) {
         Column(
             modifier = Modifier
@@ -156,17 +157,18 @@ fun ChildScreen(
                 }
 
                 if (!vpnActiveState) {
-                    Button(
-                        onClick  = { onStartVpn(); vpnActiveState = true },
-                        modifier = Modifier.fillMaxWidth().height(54.dp),
-                        shape    = RoundedCornerShape(28.dp),
-                        colors   = ButtonDefaults.buttonColors(
-                            containerColor = SfDark,
-                            contentColor   = SfCream
-                        )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(54.dp)
+                            .clip(RoundedCornerShape(28.dp))
+                            .background(Brush.horizontalGradient(listOf(Color(0xFF3EDCB5), Color(0xFF5B8FE0))))
+                            .clickable { onStartVpn(); vpnActiveState = true },
+                        contentAlignment = Alignment.Center
                     ) {
                         Text(
                             "Pornește protecția",
+                            color      = Color.White,
                             style      = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold
                         )
@@ -179,8 +181,8 @@ fun ChildScreen(
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         shape    = RoundedCornerShape(12.dp),
-                        colors   = CardDefaults.cardColors(containerColor = SfWarnBg),
-                        border   = BorderStroke(1.dp, SfBorder)
+                        colors   = CardDefaults.cardColors(containerColor = Color(0xFFFFF8E1)),
+                        border   = BorderStroke(1.dp, Color(0xFFFFD54F))
                     ) {
                         Row(
                             modifier = Modifier.padding(12.dp),
@@ -321,14 +323,16 @@ private fun ShieldHeader(isActive: Boolean) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .background(SfMid)
+            .clip(RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp))
+            .background(Brush.horizontalGradient(listOf(Color(0xFF3EDCB5), Color(0xFF5B8FE0))))
+            .statusBarsPadding()
             .padding(horizontal = 24.dp, vertical = 28.dp)
     ) {
         Column {
             Text(
                 "Safeland",
-                style        = MaterialTheme.typography.titleSmall,
-                color        = SfCream.copy(alpha = 0.65f),
+                style         = MaterialTheme.typography.titleSmall,
+                color         = Color.White.copy(alpha = 0.75f),
                 letterSpacing = 1.5.sp
             )
             Spacer(Modifier.height(4.dp))
@@ -336,7 +340,7 @@ private fun ShieldHeader(isActive: Boolean) {
                 if (isActive) "Protecție activă" else "Configurare necesară",
                 style      = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold,
-                color      = SfCream
+                color      = Color.White
             )
         }
 
@@ -346,7 +350,7 @@ private fun ShieldHeader(isActive: Boolean) {
                 .size(60.dp)
                 .scale(pulseScale)
                 .clip(CircleShape)
-                .background(SfCream.copy(alpha = 0.12f)),
+                .background(Color.White.copy(alpha = 0.2f)),
             contentAlignment = Alignment.Center
         ) {
             Text(if (isActive) "🛡️" else "⚠️", fontSize = 28.sp)
@@ -414,7 +418,7 @@ private fun StatusRow(label: String, enabled: Boolean, onAction: () -> Unit) {
                 onClick = onAction,
                 contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)
             ) {
-                Text("Activează", style = MaterialTheme.typography.labelMedium, color = SfDark,
+                Text("Activează", style = MaterialTheme.typography.labelMedium, color = Color(0xFF5B8FE0),
                     fontWeight = FontWeight.SemiBold)
             }
         } else {
